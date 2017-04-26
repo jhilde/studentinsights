@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170327145319) do
+ActiveRecord::Schema.define(version: 20170424210825) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,6 +41,13 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.string   "subject"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "courses", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "slug"
   end
 
   create_table "delayed_jobs", force: :cascade do |t|
@@ -74,6 +81,13 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.integer  "service_id"
     t.integer  "recorded_by_educator_id"
     t.datetime "recorded_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "educator_section_assignments", force: :cascade do |t|
+    t.integer  "educator_id"
+    t.integer  "section_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -225,6 +239,15 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.index ["state_id"], name: "index_schools_on_state_id", using: :btree
   end
 
+  create_table "sections", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "slug"
+    t.integer  "educator_id"
+    t.integer  "course_id"
+  end
+
   create_table "service_types", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -287,6 +310,13 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
     t.index ["student_id", "school_year_id"], name: "index_student_school_years_on_student_id_and_school_year_id", unique: true, using: :btree
+  end
+
+  create_table "student_section_assignments", force: :cascade do |t|
+    t.integer  "student_id"
+    t.integer  "section_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "students", force: :cascade do |t|

@@ -11,6 +11,7 @@ class Educator < ActiveRecord::Base
   has_one     :homeroom
   has_many    :students, through: :homeroom
   has_many    :interventions
+  has_many    :sections, through: :educator_section_assignment
 
   validates :email, presence: true, uniqueness: true
 
@@ -58,15 +59,20 @@ class Educator < ActiveRecord::Base
   # This method is the source of truth for whether an educator is authorized to view information about a particular
   # student.
   def is_authorized_for_student(student)
-    return true if self.districtwide_access?
+    #return true if self.districtwide_access?
 
     return false if self.restricted_to_sped_students && !(student.program_assigned.in? ['Sp Ed', 'SEIP'])
     return false if self.restricted_to_english_language_learners && student.limited_english_proficiency == 'Fluent'
     return false if self.school.present? && self.school != student.school
 
-    return true if self.schoolwide_access? || self.admin? # Schoolwide admin
-    return true if self.has_access_to_grade_levels? && student.grade.in?(self.grade_level_access) # Grade level access
+    #return true if self.schoolwide_access? || self.admin? # Schoolwide admin
+    #return true if self.has_access_to_grade_levels? && student.grade.in?(self.grade_level_access) # Grade level access
     return true if student.in?(self.students) # Homeroom level access
+    
+    student.sections.each do |section|
+      return true if section.in?(self.sections)
+    end
+    
     false
   end
 
@@ -121,8 +127,26 @@ class Educator < ActiveRecord::Base
     end
   end
 
+  def allowed_sections
+    return [] if school.nil?
+
+    #if districtwide_access?
+    #  Sections.all
+    #else
+      sections
+    #end
+
+    #need to add the over riding school wide, district, etc.
+    #are there also people who are department heads?
+
+  end
+
   def allowed_homerooms_by_name
     allowed_homerooms.order(:name)
+  end
+
+  def allowed_sections_by_name
+    allowed_sections.order(:name)
   end
 
   def self.to_index

@@ -1,6 +1,6 @@
 $(function() {
 
-  if ($('body').hasClass('homerooms') && $('body').hasClass('show')) {
+  if (($('body').hasClass('homerooms') || $('body').hasClass('sections')) && $('body').hasClass('show')) {
     // track user for mixpanel
     var currentEducator = $('#current-educator-data').data().currentEducator;
     var homeroom = $('#homeroom-data').data().homeroom;
@@ -8,9 +8,9 @@ $(function() {
     MixpanelUtils.registerUser(currentEducator);
     MixpanelUtils.track('PAGE_VISIT', {
       page_key: 'ROSTER_PAGE',
-      homeroom_id: homeroom.id,
-      homeroom_slug: homeroom.slug,
-      homeroom_grade: homeroom.grade
+      //homeroom_id: homeroom.id,
+      //homeroom_slug: homeroom.slug,
+      //homeroom_grade: homeroom.grade
     });
 
     // Initialize table sort on roster table

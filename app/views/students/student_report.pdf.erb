@@ -53,6 +53,10 @@ ul, li {
 <div style="float: left; width: 256px;"></div>
 <br style="clear: left;" /><br/><br/>
 
+  <% @student_sections.each do |student_section| %>
+    <span><%=student_section.name%></span>
+  <% end %>
+
 
 <!-- Notes -->
 <% if @sections.include?("notes") %>

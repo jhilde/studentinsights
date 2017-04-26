@@ -19,11 +19,11 @@ class StudentsImporter < Struct.new :school_scope, :client, :log, :progress_bar
   def import_row(row)
     student = StudentRow.new(row, school_ids_dictionary).build
 
-    if student.grade.in? ['9', '10', '11', '12', 'SP']
-      handle_high_school_student(student)
-    else
-      handle_elementary_student(student, row)
-    end
+    #if student.grade.in? ['9', '10', '11', '12', 'SP']
+    #  handle_high_school_student(student)
+    #else
+    handle_elementary_student(student, row)
+    #end
   end
 
   def handle_high_school_student(student)

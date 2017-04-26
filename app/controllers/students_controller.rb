@@ -169,6 +169,7 @@ class StudentsController < ApplicationController
     @student = Student.find(params[:id])
     @current_educator = current_educator
     @sections = (params[:sections] || "").split(",")
+    @student_sections = @student.sections
     
 
     @filter_from_date = params[:from_date] ? Date.strptime(params[:from_date],  "%m/%d/%Y") : Date.today()

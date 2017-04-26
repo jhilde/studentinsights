@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
     elsif educator.schoolwide_access? || educator.has_access_to_grade_levels?
       school_url(educator.school)
     else
+      #need to determine if this is a high school teacher, if so go to section path
       default_homeroom_path(educator)
     end
   end
