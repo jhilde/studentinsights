@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170327145319) do
+ActiveRecord::Schema.define(version: 20170501202314) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,6 +41,14 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.string   "subject"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "courses", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "school_id"
+    t.string   "slug"
   end
 
   create_table "delayed_jobs", force: :cascade do |t|
@@ -76,6 +84,13 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.datetime "recorded_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "educator_section_assignments", force: :cascade do |t|
+    t.integer "section_id"
+    t.integer "educator_id"
+    t.index ["educator_id"], name: "index_educator_section_assignments_on_educator_id", using: :btree
+    t.index ["section_id"], name: "index_educator_section_assignments_on_section_id", using: :btree
   end
 
   create_table "educators", force: :cascade do |t|
@@ -225,6 +240,15 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.index ["state_id"], name: "index_schools_on_state_id", using: :btree
   end
 
+  create_table "sections", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "school_id"
+    t.integer  "course_id"
+    t.string   "slug"
+  end
+
   create_table "service_types", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -289,6 +313,13 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.index ["student_id", "school_year_id"], name: "index_student_school_years_on_student_id_and_school_year_id", unique: true, using: :btree
   end
 
+  create_table "student_section_assignments", force: :cascade do |t|
+    t.integer "section_id"
+    t.integer "student_id"
+    t.index ["section_id"], name: "index_student_section_assignments_on_section_id", using: :btree
+    t.index ["student_id"], name: "index_student_section_assignments_on_student_id", using: :btree
+  end
+
   create_table "students", force: :cascade do |t|
     t.string   "grade"
     t.boolean  "hispanic_latino"
@@ -337,4 +368,8 @@ ActiveRecord::Schema.define(version: 20170327145319) do
     t.index ["student_school_year_id"], name: "index_tardies_on_student_school_year_id", using: :btree
   end
 
+  add_foreign_key "educator_section_assignments", "educators"
+  add_foreign_key "educator_section_assignments", "sections"
+  add_foreign_key "student_section_assignments", "sections"
+  add_foreign_key "student_section_assignments", "students"
 end

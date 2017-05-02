@@ -9,6 +9,8 @@ class Educator < ActiveRecord::Base
 
   belongs_to  :school
   has_one     :homeroom
+  has_many    :educator_section_assignment
+  has_many    :sections, through: :educator_section_assignment
   has_many    :students, through: :homeroom
   has_many    :interventions
 
@@ -67,7 +69,7 @@ class Educator < ActiveRecord::Base
     return true if self.schoolwide_access? || self.admin? # Schoolwide admin
     return true if self.has_access_to_grade_levels? && student.grade.in?(self.grade_level_access) # Grade level access
     return true if student.in?(self.students) # Homeroom level access
-    false
+    return true if student.in?(self.section_students) # Section level access
   end
 
   def is_authorized_for_school(currentSchool)
@@ -98,6 +100,10 @@ class Educator < ActiveRecord::Base
     raise Exceptions::NoHomerooms if Homeroom.count == 0    # <= We can't show any homerooms if there are none
     return homeroom if homeroom.present?                    # <= Logged-in educator has an assigned homeroom
     raise Exceptions::NoAssignedHomeroom                    # <= Logged-in educator has no assigned homeroom
+  end
+
+  def section_students
+    Student.find_by_sql(["SELECT a.* FROM students a INNER JOIN student_section_assignments b on b.student_id = a.id INNER JOIN educator_section_assignments c on c.section_id = b.section_id INNER JOIN educators d on d.id = c.educator_id WHERE d.id = ?",self.id])
   end
 
   def has_access_to_grade_levels?
