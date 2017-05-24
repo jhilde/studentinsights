@@ -58,6 +58,7 @@ RSpec.describe Educator do
     let(:authorized?) { educator.is_authorized_for_student(student) }
     let(:healey) { FactoryGirl.create(:healey) }
     let(:brown) { FactoryGirl.create(:brown) }
+    let(:highschool) { FactoryGirl.create(:highschool) }
 
     context 'educator has districtwide access' do
       let(:student) { FactoryGirl.create(:student, school: healey) }
@@ -94,6 +95,33 @@ RSpec.describe Educator do
       let(:student) { FactoryGirl.create(:student, school: brown) }
 
       it 'is not authorized' do
+        expect(authorized?).to be false
+      end
+    end
+
+    context 'student is enrolled in a section educator is assigned to' do
+      # Need to let immediate because the criteria for an educators section students uses direct sql
+      let!(:educator) { FactoryGirl.create(:educator, school: highschool, schoolwide_access: false) }
+      let!(:student) { FactoryGirl.create(:student, school: highschool) }
+      let!(:course) { FactoryGirl.create(:course, local_id: 'ALGEBRA', school: highschool)}
+      let!(:section) { FactoryGirl.create(:section, local_id: 'ALGEBRA-001', course: course, school: highschool)}
+      let!(:educator_section_assignment) { FactoryGirl.create(:educator_section_assignment, section:section, educator:educator)}
+      let!(:student_section_assignment) { FactoryGirl.create(:student_section_assignment, section:section, student:student)}
+      
+      it 'is authorized' do
+        expect(authorized?).to be true
+      end
+    end
+
+    context 'student is not enrolled in a section educator is assigned to' do
+      # Need to let immediate because the criteria for an educators section students uses direct sql
+      let!(:educator) { FactoryGirl.create(:educator, school: highschool, schoolwide_access: false) }
+      let!(:student) { FactoryGirl.create(:student, school: highschool) }
+      let!(:course) { FactoryGirl.create(:course, local_id: 'ALGEBRA', school: highschool)}
+      let!(:section) { FactoryGirl.create(:section, local_id: 'ALGEBRA-001', course: course, school: highschool)}
+      let!(:educator_section_assignment) { FactoryGirl.create(:educator_section_assignment, section:section, educator:educator)}
+      
+      it 'is authorized' do
         expect(authorized?).to be false
       end
     end

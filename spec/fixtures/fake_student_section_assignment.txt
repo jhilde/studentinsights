@@ -1,0 +1,3 @@
+Unique Class ID (Section),LASID,School ID,Course ID,School Period ID
+ALGEBRA-001,20,SHS,Algebra,FY
+ALGEBRA-001,25,SHS,Algebra,FY

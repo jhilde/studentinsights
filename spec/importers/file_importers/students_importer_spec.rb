@@ -49,25 +49,6 @@ RSpec.describe StudentsImporter do
 
       end
 
-      context 'student in database who has since graduated on to high school' do
-        let!(:graduating_student) {
-          Student.create!(local_id: '101', school: healey, grade: '8')   # Old data
-        }
-
-        it 'imports students' do
-          expect { import }.to change { Student.count }.by 2
-        end
-
-        it 'updates the student\'s data correctly' do
-          import
-
-          expect(graduating_student.reload.school).to eq nil
-          expect(graduating_student.grade).to eq 'HS'
-          expect(graduating_student.enrollment_status).to eq 'High School'
-        end
-
-      end
-
     end
 
     context 'bad data' do

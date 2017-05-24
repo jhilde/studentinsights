@@ -1,0 +1,4 @@
+"Unique Class ID (Section)","School ID","School Period","Course ID"
+"ALGEBRA-001","SHS","FY","ALGEBRA"
+"ALGEBRA-002","SHS","FY","ALGEBRA"
+"ALGEBRA-111","SHS","FY","ALGEBRA"

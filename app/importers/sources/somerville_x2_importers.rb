@@ -19,6 +19,10 @@ class SomervilleX2Importers
       'behavior' => BehaviorImporter,
       'educators' => EducatorsImporter,
       'attendance' => AttendanceImporter,
+      'courses' => CoursesImporter,
+      'sections' => SectionsImporter,
+      'educator_section_assignment' => EducatorSectionAssignmentImporter,
+      'student_section_assignment' => StudentSectionAssignmentImporter
     }
   end
 

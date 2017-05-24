@@ -44,11 +44,11 @@ ActiveRecord::Schema.define(version: 20170501202314) do
   end
 
   create_table "courses", force: :cascade do |t|
-    t.string   "name"
+    t.string   "local_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "school_id"
-    t.string   "slug"
+    t.string   "name"
   end
 
   create_table "delayed_jobs", force: :cascade do |t|
@@ -86,7 +86,7 @@ ActiveRecord::Schema.define(version: 20170501202314) do
     t.datetime "updated_at"
   end
 
-  create_table "educator_section_assignments", force: :cascade do |t|
+  create_table "educator_section_assignments", id: false, force: :cascade do |t|
     t.integer "section_id"
     t.integer "educator_id"
     t.index ["educator_id"], name: "index_educator_section_assignments_on_educator_id", using: :btree
@@ -241,12 +241,11 @@ ActiveRecord::Schema.define(version: 20170501202314) do
   end
 
   create_table "sections", force: :cascade do |t|
-    t.string   "name"
+    t.string   "local_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "school_id"
     t.integer  "course_id"
-    t.string   "slug"
   end
 
   create_table "service_types", force: :cascade do |t|
@@ -313,7 +312,7 @@ ActiveRecord::Schema.define(version: 20170501202314) do
     t.index ["student_id", "school_year_id"], name: "index_student_school_years_on_student_id_and_school_year_id", unique: true, using: :btree
   end
 
-  create_table "student_section_assignments", force: :cascade do |t|
+  create_table "student_section_assignments", id: false, force: :cascade do |t|
     t.integer "section_id"
     t.integer "student_id"
     t.index ["section_id"], name: "index_student_section_assignments_on_section_id", using: :btree

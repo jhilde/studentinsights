@@ -6,6 +6,10 @@ require_relative '../../app/importers/file_importers/x2_assessment_importer'
 require_relative '../../app/importers/file_importers/behavior_importer'
 require_relative '../../app/importers/file_importers/educators_importer'
 require_relative '../../app/importers/file_importers/attendance_importer'
+require_relative '../../app/importers/file_importers/courses_importer'
+require_relative '../../app/importers/file_importers/sections_importer'
+require_relative '../../app/importers/file_importers/student_section_assignment_importer'
+require_relative '../../app/importers/file_importers/educator_section_assignment_importer'
 
 class Import
   class Start < Thor::Group
@@ -22,7 +26,7 @@ class Import
 
     class_option :school,
       type: :array,
-      default: ['HEA', 'WSNS', 'ESCS', 'BRN', 'KDY', 'AFAS', 'WHCS'],
+      default: ['HEA', 'WSNS', 'ESCS', 'BRN', 'KDY', 'AFAS', 'WHCS', 'SHS'],
       aliases: "-s",
       desc: "Scope by school local IDs; use ELEM to import all elementary schools"
     class_option :first_time,

@@ -64,12 +64,15 @@ class Educator < ActiveRecord::Base
 
     return false if self.restricted_to_sped_students && !(student.program_assigned.in? ['Sp Ed', 'SEIP'])
     return false if self.restricted_to_english_language_learners && student.limited_english_proficiency == 'Fluent'
+    # Not sure why educators can't have access to students outside their
+    # primary school. Would be good to have the strings teachers who 
+    # teach at multiple schools to see their students? Right?
     return false if self.school.present? && self.school != student.school
-
     return true if self.schoolwide_access? || self.admin? # Schoolwide admin
     return true if self.has_access_to_grade_levels? && student.grade.in?(self.grade_level_access) # Grade level access
     return true if student.in?(self.students) # Homeroom level access
     return true if student.in?(self.section_students) # Section level access
+    false
   end
 
   def is_authorized_for_school(currentSchool)

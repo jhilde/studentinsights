@@ -18,7 +18,7 @@ class StudentsImporter < Struct.new :school_scope, :client, :log, :progress_bar
 
   def import_row(row)
     student = StudentRow.new(row, school_ids_dictionary).build
-
+  
     if student.grade.in? ['9', '10', '11', '12', 'SP']
       handle_high_school_student(student)
     else
@@ -27,13 +27,10 @@ class StudentsImporter < Struct.new :school_scope, :client, :log, :progress_bar
   end
 
   def handle_high_school_student(student)
-    return if student.new_record?  # We don't want to import HS students into the db
-                                   # since this app isn't being used at the high school
-
-    student.enrollment_status = 'High School'
-    student.grade = 'HS'
-    student.school = nil
-    student.save
+    if student.save
+      #There will be no homeroom for high school students?
+      #Student Risk levels will eventually be calculated but not yet ready
+    end
   end
 
   def handle_elementary_student(student, row)
