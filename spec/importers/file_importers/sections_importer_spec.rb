@@ -42,11 +42,6 @@ RSpec.describe SectionsImporter do
           
         end
       end
-
-      context 'missing course' do
-        it ' '
-      end
-
     end
   end
 end
