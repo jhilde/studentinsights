@@ -6,7 +6,7 @@ class Student < ActiveRecord::Base
   # Contrast with student_row.rb, which represents a row imported from X2,
   # (not necessarily in the database yet).
 
-  belongs_to :homeroom, counter_cache: true
+  belongs_to :homeroom, counter_cache: true, optional: true
   belongs_to :school
   has_many :student_school_years, dependent: :destroy
   has_many :student_assessments, dependent: :destroy
@@ -25,7 +25,7 @@ class Student < ActiveRecord::Base
 
   after_create :update_student_school_years
 
-  VALID_GRADES = [ 'PK', 'KF', '1', '2', '3', '4', '5', '6', '7', '8', 'HS'].freeze
+  VALID_GRADES = [ 'PK', 'KF', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'HS'].freeze
 
   def valid_grade
     errors.add(:grade, "must be a valid grade") unless grade.in?(VALID_GRADES)

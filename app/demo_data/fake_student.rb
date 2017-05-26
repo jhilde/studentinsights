@@ -12,7 +12,9 @@ class FakeStudent
     add_student_assessments_from_x2
     add_student_assessments_from_star
     add_student_assessments_from_access
-    @homeroom.students << @student
+    if @homeroom
+      @homeroom.students << @student
+    end
   end
 
   def student
@@ -37,11 +39,12 @@ class FakeStudent
   ]
 
   def base_data
+    @grade = @homeroom ? @homeroom.grade : ['9','10','11','12'].sample
     {
       school: @school,
       date_of_birth: fake_date_of_birth,
       enrollment_status: enrollment_status,
-      grade: @homeroom.grade,
+      grade: @grade,
       first_name: DISNEY_FIRST_NAMES.sample,
       last_name: DISNEY_LAST_NAMES.sample,
       local_id: unique_local_id,
@@ -59,7 +62,7 @@ class FakeStudent
   end
 
   def kindergarten_year
-    start_of_this_school_year - @homeroom.grade.to_i.years
+    start_of_this_school_year - @grade.to_i.years
   end
 
   def start_of_this_school_year
