@@ -1,13 +1,12 @@
 (function() {
   window.shared || (window.shared = {});
-  const merge = window.shared.ReactHelpers.merge;
 
   const QuadConverter = window.shared.QuadConverter;
 
   /*
   Project quads outside of the date range, since interpolation will connect with previous data points.
   */
-  const BarChartSparkline = window.shared.BarChartSparkline = React.createClass({
+  window.shared.BarChartSparkline = React.createClass({
     displayName: 'BarChartSparkline',
 
     propTypes: {
@@ -42,7 +41,6 @@
     },
 
     renderBars: function(quads, color, x, y){
-      const self = this;
       return quads.map(function(quad){
         return (
           <rect

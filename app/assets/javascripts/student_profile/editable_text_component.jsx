@@ -1,6 +1,7 @@
 (function() {
   window.shared || (window.shared = {});
-
+  const Sanitize = window.Sanitize;
+  
   const sanitize = new Sanitize({
     elements: ['br', 'div', 'p']
   });
@@ -76,7 +77,7 @@
   // edits the field. As such, we'll need to convert between the HTML
   // in the div and the text that is stored in the database. See
   // `textToSanitizedHTML` and `htmlToText` above.
-  const EditableTextComponent = window.shared.EditableTextComponent = React.createClass({
+  window.shared.EditableTextComponent = React.createClass({
     displayName: 'EditableTextComponent',
 
     propTypes: {

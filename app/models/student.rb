@@ -239,7 +239,7 @@ class Student < ActiveRecord::Base
   def sped_data
     {
       sped_level: sped_level,
-      sped_tooltip_message: sped_tooltip_message, 
+      sped_tooltip_message: sped_tooltip_message,
       sped_bubble_class: sped_bubble_class
     }
   end
@@ -255,7 +255,7 @@ class Student < ActiveRecord::Base
     when "High"
       "4"
     else
-      "---"
+      "—"
     end
   end
 
@@ -271,12 +271,12 @@ class Student < ActiveRecord::Base
       "#{self.first_name} receives 15+ hours of special education services per week."
     else
       nil
-    end  
+    end
   end
 
   def sped_bubble_class
     case sped_level
-    when "---"
+    when "—"
       "sped"
     else
       "warning-bubble sped-risk-bubble tooltip"

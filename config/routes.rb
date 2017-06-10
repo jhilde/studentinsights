@@ -40,12 +40,12 @@ Rails.application.routes.draw do
   resources :event_note_attachments, only: [:destroy]
   resources :service_uploads, only: [:create, :index, :destroy]
   resources :homerooms, only: [:show]
+  resources :import_records, only: [:index]
 
   resources :schools, only: [:show] do
     get :star_reading, on: :member
     get :star_math, on: :member
     get :csv, on: :member
-    get :show_fast, on: :member
     get :get_precomputed_hashes_for_school, on: :member
     get :get_mutable_fields_for_school, on: :member
   end

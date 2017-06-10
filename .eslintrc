@@ -13,11 +13,16 @@
     "afterEach": true,
     "jasmine": true,
     "expect": true,
-    "it": true
+    "it": true,
+    "d3": true,
+    "Highcharts": true
   },
   "parserOptions": {
     "ecmaVersion": 6,
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    }
   },
   "plugins": ["react"],
   "extends": [

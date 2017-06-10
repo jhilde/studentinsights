@@ -1,13 +1,32 @@
 (function() {
   window.shared || (window.shared = {});
-  const merge = window.shared.ReactHelpers.merge;
 
-  const ServiceTypeDropdown = window.shared.ServiceTypeDropdown = React.createClass({
+  window.shared.ServiceTypeDropdown = React.createClass({
 
     propTypes: {
       onUserTypingServiceType: React.PropTypes.func.isRequired,
       onUserSelectServiceType: React.PropTypes.func.isRequired,
       value: React.PropTypes.string.isRequired
+    },
+
+    componentDidMount: function() {
+      const self = this;
+
+      $(this.refs.ServiceTypeDropdown).autocomplete({
+        source: '/service_types/',
+        delay: 0,
+        minLength: 0,
+        autoFocus: true,
+
+        select: function(event, ui) {
+          self.props.onUserSelectServiceType(ui.item.value);
+        },
+
+      });
+    },
+
+    toggleOpenMenu: function () {
+      $(this.refs.ServiceTypeDropdown).autocomplete('search', '');
     },
 
     render: function () {
@@ -37,26 +56,6 @@
           </a>
         </div>
       );
-    },
-
-    componentDidMount: function() {
-      const self = this;
-
-      $(this.refs.ServiceTypeDropdown).autocomplete({
-        source: '/service_types/',
-        delay: 0,
-        minLength: 0,
-        autoFocus: true,
-
-        select: function(event, ui) {
-          self.props.onUserSelectServiceType(ui.item.value);
-        },
-
-      });
-    },
-
-    toggleOpenMenu: function () {
-      $(this.refs.ServiceTypeDropdown).autocomplete('search', '');
     },
 
   });

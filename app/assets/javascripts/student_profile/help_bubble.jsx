@@ -1,8 +1,8 @@
 (function() {
   window.shared || (window.shared = {});
-  const merge = window.shared.ReactHelpers.merge;
+  const ReactModal = window.ReactModal;
 
-  const HelpBubble = window.shared.HelpBubble = React.createClass({
+  window.shared.HelpBubble = React.createClass({
     propTypes: {
       title: React.PropTypes.string.isRequired, // e.g. 'What is a Note?'
       content: React.PropTypes.object.isRequired, // React DOM objects which will be displayed in the modal text box.
@@ -12,17 +12,20 @@
     getInitialState: function(){
       return {modalIsOpen: false};
     },
+
+    componentWillMount: function(){
+      // This needs to be called for some reason, and we need to do it by the time the DOM exists.
+      ReactModal.setAppElement(document.body);
+    },
+
     closeModal: function(e){
       this.setState({modalIsOpen: false});
       e.preventDefault();
     },
+
     openModal: function(e){
       this.setState({modalIsOpen: true});
       e.preventDefault();
-    },
-    componentWillMount: function(){
-      // This needs to be called for some reason, and we need to do it by the time the DOM exists.
-      ReactModal.setAppElement(document.body);
     },
 
     render: function(){
