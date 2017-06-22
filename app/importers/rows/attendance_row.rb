@@ -8,6 +8,7 @@ class AttendanceRow < Struct.new(:row)
   class NullRelation
     class NullEvent
       def save!; end
+      def assign_attributes(_); end
     end
 
     def find_or_initialize_by(_)
@@ -20,16 +21,18 @@ class AttendanceRow < Struct.new(:row)
   end
 
   def build
-    attendance_event_class.find_or_initialize_by(
+    attendance_event = attendance_event_class.find_or_initialize_by(
       occurred_at: row[:event_date]
     )
+
+    return attendance_event
   end
 
   private
 
   def attendance_event_class
-    return student_school_year.absences if row[:absence].to_i == 1
-    return student_school_year.tardies if row[:tardy].to_i == 1
+    return student.absences if row[:absence].to_i == 1
+    return student.tardies if row[:tardy].to_i == 1
     NullRelation.new
   end
 
@@ -37,11 +40,4 @@ class AttendanceRow < Struct.new(:row)
     Student.find_by_local_id!(row[:local_id])
   end
 
-  def school_year
-    DateToSchoolYear.new(row[:event_date]).convert
-  end
-
-  def student_school_year
-    student.student_school_years.find_or_create_by(school_year: school_year)
-  end
 end

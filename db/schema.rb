@@ -10,17 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170501202314) do
+ActiveRecord::Schema.define(version: 20170620234256) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "absences", force: :cascade do |t|
-    t.integer  "student_school_year_id", null: false
-    t.datetime "occurred_at",            null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.index ["student_school_year_id"], name: "index_absences_on_student_school_year_id", using: :btree
+    t.datetime "occurred_at", null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.integer  "student_id"
+    t.index ["student_id"], name: "index_absences_on_student_id", using: :btree
   end
 
   create_table "assessment_families", force: :cascade do |t|
@@ -68,14 +68,14 @@ ActiveRecord::Schema.define(version: 20170501202314) do
 
   create_table "discipline_incidents", force: :cascade do |t|
     t.string   "incident_code"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
     t.string   "incident_location"
     t.text     "incident_description"
-    t.datetime "occurred_at",            null: false
+    t.datetime "occurred_at",          null: false
     t.boolean  "has_exact_time"
-    t.integer  "student_school_year_id", null: false
-    t.index ["student_school_year_id"], name: "index_discipline_incidents_on_student_school_year_id", using: :btree
+    t.integer  "student_id"
+    t.index ["student_id"], name: "index_discipline_incidents_on_student_id", using: :btree
   end
 
   create_table "discontinued_services", force: :cascade do |t|
@@ -207,9 +207,7 @@ ActiveRecord::Schema.define(version: 20170501202314) do
     t.datetime "updated_at"
     t.integer  "educator_id"
     t.integer  "number_of_hours"
-    t.integer  "school_year_id"
     t.text     "goal"
-    t.integer  "student_school_year_id"
     t.string   "custom_intervention_name"
   end
 
@@ -219,13 +217,6 @@ ActiveRecord::Schema.define(version: 20170501202314) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["key"], name: "index_precomputed_query_docs_on_key", unique: true, using: :btree
-  end
-
-  create_table "school_years", force: :cascade do |t|
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.date     "start"
   end
 
   create_table "schools", force: :cascade do |t|
@@ -284,11 +275,8 @@ ActiveRecord::Schema.define(version: 20170501202314) do
     t.datetime "updated_at"
     t.integer  "percentile_rank"
     t.decimal  "instructional_reading_level"
-    t.integer  "school_year_id"
     t.integer  "assessment_id"
-    t.integer  "student_school_year_id"
     t.string   "grade_equivalent"
-    t.index ["school_year_id"], name: "index_student_assessments_on_school_year_id", using: :btree
     t.index ["student_id"], name: "index_student_assessments_on_student_id", using: :btree
   end
 
@@ -304,6 +292,7 @@ ActiveRecord::Schema.define(version: 20170501202314) do
     t.integer  "limited_english_proficiency_risk_level"
   end
 
+<<<<<<< HEAD
   create_table "student_school_years", force: :cascade do |t|
     t.integer  "student_id",     null: false
     t.integer  "school_year_id", null: false
@@ -319,6 +308,8 @@ ActiveRecord::Schema.define(version: 20170501202314) do
     t.index ["student_id"], name: "index_student_section_assignments_on_student_id", using: :btree
   end
 
+=======
+>>>>>>> f1e1d1b886b0842a9b7df3b73284e8ec108b2442
   create_table "students", force: :cascade do |t|
     t.string   "grade"
     t.boolean  "hispanic_latino"
@@ -360,15 +351,21 @@ ActiveRecord::Schema.define(version: 20170501202314) do
   end
 
   create_table "tardies", force: :cascade do |t|
-    t.integer  "student_school_year_id", null: false
-    t.datetime "occurred_at",            null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.index ["student_school_year_id"], name: "index_tardies_on_student_school_year_id", using: :btree
+    t.datetime "occurred_at", null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.integer  "student_id"
+    t.index ["student_id"], name: "index_tardies_on_student_id", using: :btree
   end
 
+<<<<<<< HEAD
   add_foreign_key "educator_section_assignments", "educators"
   add_foreign_key "educator_section_assignments", "sections"
   add_foreign_key "student_section_assignments", "sections"
   add_foreign_key "student_section_assignments", "students"
+=======
+  add_foreign_key "absences", "students"
+  add_foreign_key "discipline_incidents", "students"
+  add_foreign_key "tardies", "students"
+>>>>>>> f1e1d1b886b0842a9b7df3b73284e8ec108b2442
 end

@@ -18,22 +18,6 @@ class StudentsImporter < Struct.new :school_scope, :client, :log, :progress_bar
 
   def import_row(row)
     student = StudentRow.new(row, school_ids_dictionary).build
-  
-    if student.grade.in? ['9', '10', '11', '12', 'SP']
-      handle_high_school_student(student)
-    else
-      handle_elementary_student(student, row)
-    end
-  end
-
-  def handle_high_school_student(student)
-    if student.save
-      #There will be no homeroom for high school students?
-      #Student Risk levels will eventually be calculated but not yet ready
-    end
-  end
-
-  def handle_elementary_student(student, row)
     if student.save
       assign_student_to_homeroom(student, row[:homeroom])
       student.create_student_risk_level!

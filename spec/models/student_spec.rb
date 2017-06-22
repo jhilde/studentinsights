@@ -23,6 +23,70 @@ RSpec.describe Student do
     end
   end
 
+  describe '#most_recent_school_year_absences_count' do
+    let(:student) { FactoryGirl.create(:student) }
+
+    context 'no absences ever' do
+
+      it 'returns zero' do
+        expect(student.most_recent_school_year_absences_count).to eq(0)
+      end
+    end
+
+    context 'no absences this school year, one last year' do
+      let!(:absence) {
+        FactoryGirl.create(:absence,
+          student: student,
+          occurred_at: DateTime.new(2016, 9, 1)
+        )
+      }
+
+      it 'returns zero' do
+        Timecop.freeze(DateTime.new(2017, 9, 1)) do
+          expect(student.most_recent_school_year_absences_count).to eq(0)
+        end
+      end
+    end
+
+    context 'two absences this school year (first half of year)' do
+      before do
+        FactoryGirl.create(:absence,
+          student: student,
+          occurred_at: DateTime.new(2017, 9, 1)
+        )
+        FactoryGirl.create(:absence,
+          student: student,
+          occurred_at: DateTime.new(2017, 9, 2)
+        )
+      end
+
+      it 'returns two' do
+        Timecop.freeze(DateTime.new(2018, 6, 1)) do
+          expect(student.most_recent_school_year_absences_count).to eq(2)
+        end
+      end
+    end
+
+    context 'two absences this school year (second half of year)' do
+      before do
+        FactoryGirl.create(:absence,
+          student: student,
+          occurred_at: DateTime.new(2018, 5, 1)
+        )
+        FactoryGirl.create(:absence,
+          student: student,
+          occurred_at: DateTime.new(2018, 5, 2)
+        )
+      end
+
+      it 'returns two' do
+        Timecop.freeze(DateTime.new(2018, 6, 1)) do
+          expect(student.most_recent_school_year_absences_count).to eq(2)
+        end
+      end
+    end
+  end
+
   describe '#latest_result_by_family_and_subject' do
     let(:student) { FactoryGirl.create(:student) }
     let(:assessment_family) { "MCAS" }
@@ -127,69 +191,6 @@ RSpec.describe Student do
           middle_mcas_math_result,
           newest_mcas_math_result
         ])
-      end
-    end
-  end
-
-  describe '#find_student_school_years' do
-    context 'school years in the 2010s' do
-      let!(:sy_2014_2015) { FactoryGirl.create(:sy_2014_2015) }
-      let!(:sy_2013_2014) { FactoryGirl.create(:sy_2013_2014) }
-      let!(:sy_2012_2013) { FactoryGirl.create(:sy_2012_2013) }
-
-      context 'student has registration date' do
-        let!(:student) { FactoryGirl.create(:student_who_registered_in_2013_2014) }
-        it 'calculates student school years based on registration date' do
-          Timecop.freeze(Time.new(2015, 5, 24)) do
-            expect(student.find_student_school_years).to eq([sy_2014_2015, sy_2013_2014])
-          end
-        end
-      end
-
-      context 'student has numerical grade level (1 through 12)' do
-        context 'student is in 2nd grade' do
-          let(:student) { FactoryGirl.create(:second_grade_student) }
-          it 'assumes student has been attending SPS since K' do
-            Timecop.freeze(Time.new(2015, 5, 24)) do
-              expect(student.find_student_school_years).to eq([sy_2014_2015, sy_2013_2014, sy_2012_2013])
-            end
-          end
-        end
-      end
-
-      context 'student has non-numerical grade level' do
-        context 'student grade level is PK' do
-          let(:student) { FactoryGirl.create(:pre_k_student) }
-          it 'assumes student is in 1st year of SPS' do
-            Timecop.freeze(Time.new(2015, 5, 24)) do
-              expect(student.find_student_school_years).to eq([sy_2014_2015])
-            end
-          end
-        end
-      end
-
-    end
-  end
-
-  describe '#update_student_school_years' do
-    context 'when student has been in school for two years' do
-      let!(:student) { FactoryGirl.build(:student_who_registered_in_2013_2014) }
-      it 'creates two new student school years' do
-        Timecop.freeze(Time.new(2015, 5, 24)) do
-          expect {
-            student.save
-          }.to change {
-            StudentSchoolYear.count
-          }.by 2
-        end
-      end
-      it 'assigns the student school year attributes' do
-        Timecop.freeze(Time.new(2015, 5, 24)) do
-          student.save
-          expect(StudentSchoolYear.last.student).to eq(student)
-          expect(StudentSchoolYear.last.school_year.name).to eq '2013-2014'
-          expect(StudentSchoolYear.first.school_year.name).to eq '2014-2015'
-        end
       end
     end
   end

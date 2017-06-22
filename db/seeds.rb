@@ -178,7 +178,6 @@ end
 
 
 Student.update_risk_levels
-Student.update_student_school_years
 Student.update_recent_student_assessments
 PrecomputeStudentHashesJob.new(STDOUT).precompute_all!(Time.now)
 
