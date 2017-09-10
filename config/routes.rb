@@ -19,6 +19,10 @@ Rails.application.routes.draw do
 
   get 'no_homeroom' => 'pages#no_homeroom'
   get 'no_homerooms' => 'pages#no_homerooms'
+
+  get 'no_section' => 'pages#no_section'
+  get 'no_sections' => 'pages#no_sections'
+
   get 'not_authorized' => 'pages#not_authorized'
 
   if ENV['LETS_ENCRYPT_ENDPOINT']
@@ -48,7 +52,5 @@ Rails.application.routes.draw do
     get :star_reading, on: :member
     get :star_math, on: :member
     get :csv, on: :member
-    get :get_precomputed_hashes_for_school, on: :member
-    get :get_mutable_fields_for_school, on: :member
   end
 end

@@ -72,12 +72,13 @@ export default React.createClass({
   },
 
   toggleColumn (columnKey) {
-    const columnsDisplayed = Object.assign(this.state.columnsDisplayed, {});
-    const index = columnsDisplayed.indexOf(columnKey);
-    const isColumnDisplayed = (index > -1);
+    const columnsDisplayed = _.clone(this.state.columnsDisplayed);
+    const columnKeyIndex = _.indexOf(columnsDisplayed, columnKey);
+
+    const isColumnDisplayed = (columnKeyIndex > -1);
 
     if (isColumnDisplayed) {
-      columnsDisplayed.splice(index, 1);
+      columnsDisplayed.splice(columnKeyIndex, 1);
     } else {
       columnsDisplayed.push(columnKey);
     }
@@ -144,7 +145,7 @@ export default React.createClass({
 
   showStar () {
     const columnsDisplayed = this.state.columnsDisplayed;
-    const starDisplayed = columnsDisplayed.indexOf('star') > -1;
+    const starDisplayed = _.indexOf(columnsDisplayed, 'star') > -1;
 
     if (this.props.showStar === true && starDisplayed === true) return true;
 
@@ -153,7 +154,7 @@ export default React.createClass({
 
   showMcas () {
     const columnsDisplayed = this.state.columnsDisplayed;
-    const mcasDisplayed = columnsDisplayed.indexOf('mcas') > -1;
+    const mcasDisplayed = _.indexOf(columnsDisplayed, 'mcas') > -1;
 
     if (this.props.showMcas === true && mcasDisplayed === true) return true;
 
@@ -170,9 +171,9 @@ export default React.createClass({
 
   render () {
     return (
-      <div id="roster-table-wrapper">
+      <div>
         {this.renderColumnPickerArea()}
-        <table id="roster-table" cellSpacing="0" cellPadding="10" className="sort-default">
+        <table id="roster-table" cellSpacing="0" cellPadding="5" className="sort-default">
           {this.renderHeaders()}
           {this.renderRows()}
         </table>
@@ -290,8 +291,9 @@ export default React.createClass({
 
   renderSubHeader (columnKey, label, sortBy, sortType) {
     const columnsDisplayed = this.state.columnsDisplayed;
+    const columnKeyIndex = _.indexOf(columnsDisplayed, columnKey);
 
-    if (columnsDisplayed.indexOf(columnKey) === -1) return null;
+    if (columnKeyIndex === -1) return null;
 
     return (
       <th className="sortable_header"
@@ -303,8 +305,9 @@ export default React.createClass({
 
   renderSuperHeader (columnKey, columnSpan, label) {
     const columnsDisplayed = this.state.columnsDisplayed;
+    const columnKeyIndex = _.indexOf(columnsDisplayed, columnKey);
 
-    if (columnsDisplayed.indexOf(columnKey) === -1) return null;
+    if (columnKeyIndex === -1) return null;
 
     if (!label) return (
       <td colSpan={columnSpan}></td>
@@ -386,8 +389,9 @@ export default React.createClass({
 
   renderDataCell (columnKey, data) {
     const columnsDisplayed = this.state.columnsDisplayed;
+    const columnKeyIndex = _.indexOf(columnsDisplayed, columnKey);
 
-    if (columnsDisplayed.indexOf(columnKey) === -1) return null;
+    if (columnKeyIndex === -1) return null;
 
     return (
       <td>{data || '—'}</td>
@@ -435,14 +439,18 @@ export default React.createClass({
     );
   },
 
-  renderRow (row) {
+  renderRow (row, index) {
     const fullName = `${row['first_name']} ${row['last_name']}`;
     const id = row["id"];
+    const style = (index % 2 === 0)
+                    ? { backgroundColor: '#FFFFFF' }
+                    : { backgroundColor: '#F7F7F7' };
 
     return (
       <tr className="student-row"
           onClick={this.visitStudentProfile.bind(null, id)}
-          key={id}>
+          key={id}
+          style={style}>
         <td className="name">{fullName}</td>
         {this.renderDataCell('risk', this.renderWarningBubble(row))}
         {this.renderDataCell('program', row['program_assigned'])}
@@ -461,11 +469,11 @@ export default React.createClass({
   renderRows () {
     if (!this.props.rows) return null;
 
-    const activeStudentRows = this.orderedStudents();
+    const rows = this.orderedStudents();
 
     return (
       <tbody>
-        {activeStudentRows.map(this.renderRow)}
+        {rows.map((row, index) => { return this.renderRow(row, index); }, this)}
       </tbody>
     );
   },
@@ -504,7 +512,7 @@ export default React.createClass({
     const onToggleColumn = this.toggleColumn.bind(null, columnKey);
 
     const columnsDisplayed = this.state.columnsDisplayed;
-    const isColumnDisplayed = (columnsDisplayed.indexOf(columnKey) > -1);
+    const isColumnDisplayed = (_.indexOf(columnsDisplayed, columnKey) > -1);
 
     if (isColumnDisplayed) return (
       <div key={columnKey}>

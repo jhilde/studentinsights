@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/studentinsights/studentinsights.svg?branch=master)](https://travis-ci.org/studentinsights/studentinsights)
 [![Code Climate](https://codeclimate.com/github/studentinsights/studentinsights/badges/gpa.svg)](https://codeclimate.com/github/studentinsights/studentinsights)
 
-Student Insights gives educators an overview of student progress at their school, classroom-level rosters and individual student profiles.  It also allows them to capture interventions and notes during weekly or bi-weekly student support meetings focused on the most at-risk students.  It’s currently in use at the pilot elementary school in Somerville.
+Student Insights gives educators an overview of student progress at their school, classroom-level rosters and individual student profiles.  It also allows them to capture interventions and notes during weekly or bi-weekly student support meetings focused on the most at-risk students.
 
 Check out the [demo site](https://somerville-teacher-tool-demo.herokuapp.com/):
   - username: `demo@example.com`
@@ -23,9 +23,9 @@ Our presentation at [Code for Boston demo night](docs/readme_images/Student%20In
   - [Classroom rosters](#classroom-rosters)
   - [Student profiles](#student-profiles)
     - [Capturing meeting notes and interventions](#capturing-meeting-notes-and-interventions)
-- [School deployment](#school-deployment)
 - [Contributing](#contributing)
 - [How it works](#how-it-works)
+  - [Admin dashboard](#admin-dashboard)
 - [Development Environment](#development-environment)
   - [1. Install dependencies](#1-install-dependencies)
   - [2. Create database tables and seed them with demo data](#2-create-database-tables-and-seed-them-with-demo-data)
@@ -34,12 +34,12 @@ Our presentation at [Code for Boston demo night](docs/readme_images/Student%20In
   - [5. Write code!](#5-write-code)
 - [Browser/OS Targeting](#browseros-targeting)
 - [Deployment](#deployment)
-  - [Importing real data](#importing-real-data)
-  - [LDAP](#ldap)
-  - [Heroku](#heroku)
-    - [Migrations on Heroku](#migrations-on-heroku)
-    - [Rebuilding database in staging environment](#rebuilding-database-in-staging-environment)
-  - [Adding a new district](#new-district)
+  - [Deploying new code to Insights](#deploying-new-code-to-insights)
+  - [Setting up Insights for a new district](#setting-up-insights-for-a-new-district)
+    - [New district script](#new-district-script)
+    - [Importing real data](#importing-real-data)
+    - [LDAP](#ldap)
+    - [Heroku notes](#heroku-notes)
 - [Other Tools](#other-tools)
   - [Mixpanel](#mixpanel)
 - [More information](#more-information)
@@ -90,22 +90,6 @@ It's one thing to have data, but acting on it to improve student outcomes is wha
 ![Interventions](docs/readme_images/recording-services-screenshot.png)
 
 It also allows capturing meeting notes as part of the student's record, which is particularly important on interdisciplinary teams.
-
-# School deployment
-
-Somerville Public Schools has seven elementary schools, one high school, and two alternative schools.
-
-We are focusing on rolling out Student Insights for Somerville's elementary schools:
-
-School | Data imported | Principal on-boarded | Used at an SST/MTSS meeting
---- | --- | --- | ---
-Healey | :white_check_mark: | :white_check_mark: | :white_check_mark:
-West | :white_check_mark: | :white_check_mark: | :white_check_mark:
-East | :white_check_mark: | :soon: |
-Brown | :white_check_mark: | |
-Kennedy | :white_check_mark: | |
-Argenziano | :white_check_mark: | |
-Winter Hill | :white_check_mark: | |
 
 # Contributing
 We'd love your help! Take a look at **[CONTRIBUTING.md](CONTRIBUTING.md)** for more information on ways educators, developers and others can get involved and contribute directly to the project.  You can also learn how to join our online chat channel and submit pull requests and join us in person at our weekly hack night with Code for America, in Kendall Square, Cambridge.
@@ -194,59 +178,15 @@ OS | Windows 7 and 8.1 | "Maybe some Win10 next year." <br>    – John Breslin,
 
 # Deployment
 
-## Importing real data
+## Deploying new code to Insights
 
-If you're working with a real school district, you'll need flat files of the data you want to import.
+See our guide:
 
-Run an import task:
+[Merging and deploying new code to Heroku](docs/technical/merging_and_deploying_to_heroku.md).
 
-```
-thor import:start
-```
+## Setting up Insights for a new district
 
-So far, Student Insights can import CSV and JSON and can fetch data from AWS and SFTP. To import a new flat file type, write a new data transformer: `app/importers/data_transformers`. To import from a new storage location, write a new client: `app/importers/clients`.
-
-## LDAP
-
-The project is configured to use LDAP as its authentication strategy in production. To use database authentication (in a production demo site, for example) set the `SHOULD_USE_LDAP` environment variable. Authentication strategies are defined in `educator.rb`.
-
-## Heroku
-
-We deployed this app on Heroku and you can, too.
-
-[Quotaguard Static](https://www.quotaguard.com/static-ip), a Heroku add-on, provides the static IP addresses needed to connect with Somerville's LDAP server behind a firewall. This requires additional configuration to prevent Quotaguard Static from interfering with the connection between application and database. One way to accomplish this is to set a `QUOTAGUARDSTATIC_MASK` environment variable that routes only outbound traffic to certain IP subnets using the static IPs. [Read Quotaguard Static's documentation for more information.](https://devcenter.heroku.com/articles/quotaguardstatic#socks-proxy-setup)
-
-Set strong secret keys for `DEVISE_SECRET_KEY` and `SECRET_KEY_BASE` when you deploy.
-
-### Migrations on Heroku
-
-This is how to execute a standard Rails migration.  This is focused on the production deployment, but the demo site is the same, just add `--app somerville-teacher-tool-demo` to the Heroku CLI commands.
-
-  - db:migrate isn't run as part of the deploy process and needs to be done manually
-  - in order to `heroku run rake db:migrate` in production, the migration code needs to be merged to master and deployed to heroku
-  - this means the commit adding migrations needs to work both with and without the migrations having been run
-  - after deploying, you can run the migration and restart Rails through the Heroku CLI
-
-So concretely, once your commit is on master, `git push heroku master && heroku run rake db:migrate` will deploy the new code and run the migration.  This will cause a few seconds of downtime.
-
-### Rebuilding database in staging environment
-
-Rebuilding the database in a staging deployment is a destructive action and permanently deletes data in the staging environment.
-
-To do this:
-
-```
-# drop database
-heroku pg:reset DATABASE --app student-insights-staging
-
-# create database tables, run migrations and seed
-heroku run bundle exec rake db:create db:migrate db:seed:somerville --app student-insights-staging
-
-# import data
-heroku run:detached thor import:start --app student-insights-staging
-```
-
-## New district
+### New district script
 
 Insights uses a separate-instance strategy for new districts (one database and one Heroku app per district).
 
@@ -258,7 +198,31 @@ $ scripts/deploy/new_district.sh "My New District Name"
 
 This sets up a new Heroku app instance with the Student Insights code and copies over some basic configuration around the district name. It gives you the option to fill the instance with fake data if you like. It doesn't yet include tooling for connecting with a Student Information System or other district-level data sources.
 
+### Importing real data
+
+If you're working with a real school district, you'll need flat files of the data you want to import.
+
+Run an import task:
+
+```
+thor import:start
+```
+
+So far, Student Insights can import CSV and JSON and can fetch data from AWS and SFTP. To import a new flat file type, write a new data transformer: `app/importers/data_transformers`. To import from a new storage location, write a new client: `app/importers/clients`.
+
+### LDAP
+
+The project is configured to use LDAP as its authentication strategy in production. To use database authentication (in a production demo site, for example) set the `SHOULD_USE_LDAP` environment variable. Authentication strategies are defined in `educator.rb`.
+
+### Heroku notes
+
+[Quotaguard Static](https://www.quotaguard.com/static-ip), a Heroku add-on, provides the static IP addresses needed to connect with Somerville's LDAP server behind a firewall. This requires additional configuration to prevent Quotaguard Static from interfering with the connection between application and database.
+
+One way to accomplish this is to set a `QUOTAGUARDSTATIC_MASK` environment variable that routes only outbound traffic to certain IP subnets using the static IPs. [Read Quotaguard Static's documentation for more information.](https://devcenter.heroku.com/articles/quotaguardstatic#socks-proxy-setup)
+
+
 # Other Tools
+
 ## Mixpanel
 
 We use [Mixpanel](https://mixpanel.com) to track user interactions on the client side. It gives us nice graphs so we can see who's using the app and how.

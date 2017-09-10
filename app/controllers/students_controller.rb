@@ -34,7 +34,7 @@ class StudentsController < ApplicationController
       chart_data: chart_data,                                   # STAR, MCAS, discipline, attendance charts
       dibels: student.student_assessments.by_family('DIBELS'),
       service_types_index: service_types_index,
-      event_note_types_index: event_note_types_index,
+      event_note_types_index: EventNoteSerializer.event_note_types_index,
       educators_index: Educator.to_index,
       access: student.latest_access_results,
       iep_documents: student.iep_documents,
@@ -54,7 +54,7 @@ class StudentsController < ApplicationController
       current_educator: current_educator,
       student: serialize_student_for_profile(student),
       feed: student_feed(student, restricted_notes: true),
-      event_note_types_index: event_note_types_index,
+      event_note_types_index: EventNoteSerializer.event_note_types_index,
       educators_index: Educator.to_index,
     }
   end
@@ -135,7 +135,7 @@ class StudentsController < ApplicationController
     {
       event_notes: student.event_notes
         .select {|note| note.is_restricted == restricted_notes}
-        .map {|event_note| serialize_event_note(event_note) },
+        .map {|event_note| EventNoteSerializer.new(event_note).serialize_event_note },
       services: {
         active: student.services.active.map {|service| serialize_service(service) },
         discontinued: student.services.discontinued.map {|service| serialize_service(service) }
@@ -175,7 +175,7 @@ class StudentsController < ApplicationController
     @event_notes = @student.event_notes.where(:is_restricted => false).where(recorded_at: @filter_from_date..@filter_to_date)
 
     # Load services for the student for the filtered dates
-    @services = @student.services.includes(:discontinued_services).where("date_started <= ? AND (discontinued_services.recorded_at >= ? OR discontinued_services.recorded_at IS NULL)", @filter_to_date, @filter_from_date).order('date_started, discontinued_services.recorded_at').references(:discontinued_services)
+    @services = @student.services.includes(:discontinued_services).where("date_started <= ? AND (discontinued_services.discontinued_at >= ? OR discontinued_services.discontinued_at IS NULL)", @filter_to_date, @filter_from_date).order('date_started, discontinued_services.discontinued_at').references(:discontinued_services)
 
     # Load student school years for the filtered dates
     @student_school_years = @student.events_by_student_school_years(@filter_from_date, @filter_to_date)

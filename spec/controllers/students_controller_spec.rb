@@ -8,6 +8,13 @@ def create_service(student, educator)
   })
 end
 
+def create_event_note(student, educator)
+  FactoryGirl.create(:event_note, {
+    student: student,
+    educator: educator,
+  })
+end
+
 describe StudentsController, :type => :controller do
 
   describe '#show' do
@@ -55,7 +62,6 @@ describe StudentsController, :type => :controller do
             services: {active: [], discontinued: []},
             deprecated: {interventions: []}
           })
-
 
           expect(serialized_data[:service_types_index]).to eq({
             502 => {:id=>502, :name=>"Attendance Officer"},
@@ -141,6 +147,21 @@ describe StudentsController, :type => :controller do
             expect(response).to be_success
           end
         end
+
+        context 'educator has section access' do
+          let!(:educator) { FactoryGirl.create(:educator, school: school)}
+          let!(:course) { FactoryGirl.create(:course, school: school)}
+          let!(:section) { FactoryGirl.create(:section) }
+          let!(:esa) { FactoryGirl.create(:educator_section_assignment, educator: educator, section: section) }
+          let!(:section_student) { FactoryGirl.create(:student, school: school) }
+          let!(:ssa) { FactoryGirl.create(:student_section_assignment, student: section_student, section: section) }
+          
+          it 'is successful' do
+            make_request({ student_id: section_student.id, format: :html })
+            expect(response).to be_success
+          end
+        end
+          
 
         context 'educator does not have schoolwide, grade level, or homeroom access' do
           let(:educator) { FactoryGirl.create(:educator, school: school) }
@@ -383,6 +404,7 @@ describe StudentsController, :type => :controller do
     let(:student) { FactoryGirl.create(:student) }
     let(:educator) { FactoryGirl.create(:educator, :admin) }
     let!(:service) { create_service(student, educator) }
+    let!(:event_note) { create_event_note(student, educator) }
 
     it 'returns services' do
       feed = controller.send(:student_feed, student)
@@ -391,12 +413,21 @@ describe StudentsController, :type => :controller do
       expect(feed[:services][:active].first[:id]).to eq service.id
     end
 
+    it 'returns event notes' do
+      feed = controller.send(:student_feed, student)
+      event_notes = feed[:event_notes]
+
+      expect(event_notes.size).to eq 1
+      expect(event_notes.first[:student_id]).to eq(student.id)
+      expect(event_notes.first[:educator_id]).to eq(educator.id)
+    end
+
     context 'after service is discontinued' do
       before do
         DiscontinuedService.create!({
           service_id: service.id,
           recorded_by_educator_id: educator.id,
-          recorded_at: Time.now
+          discontinued_at: Time.now
         })
       end
       it 'filters it' do
@@ -529,7 +560,7 @@ describe StudentsController, :type => :controller do
 
         it 'assigns the student\'s services correctly with full history' do
           old_service = FactoryGirl.create(:service, date_started: '2012-02-22', student: student)
-          FactoryGirl.create(:discontinued_service, service: old_service, recorded_at: '2012-05-21')
+          FactoryGirl.create(:discontinued_service, service: old_service, discontinued_at: '2012-05-21')
           recent_service = FactoryGirl.create(:service, date_started: '2016-01-13', student: student)
           expect(assigns(:services)).not_to include(old_service)
           expect(assigns(:services)).to include(recent_service)
